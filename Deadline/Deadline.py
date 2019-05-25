@@ -47,21 +47,21 @@ class Player():
             if self.direction == 'Right':
                 self.rect[3] = 35
                 self.rect[2] = 45
-                Screen.blit(self.images[0], (self.rect[0] - self.rect[2], self.rect[1] - self.rect[3]))
+                Screen.blit(self.images[0], (self.rect[0], self.rect[1]))
             elif self.direction == 'Up':
                 self.rect[3] = 45
                 self.rect[2] = 35
-                Screen.blit(self.images[1], (self.rect[0] - self.rect[2], self.rect[1] - self.rect[3]))
+                Screen.blit(self.images[1], (self.rect[0], self.rect[1]))
             elif self.direction == 'Left':
                 self.rect[3] = 35
                 self.rect[2] = 45
-                Screen.blit(self.images[2], (self.rect[0] - self.rect[2], self.rect[1] - self.rect[3]))
+                Screen.blit(self.images[2], (self.rect[0], self.rect[1]))
             elif self.direction == 'Down':
                 self.rect[3] = 45
                 self.rect[2] = 35
-                Screen.blit(self.images[3], (self.rect[0] - self.rect[2], self.rect[1] - self.rect[3]))
+                Screen.blit(self.images[3], (self.rect[0], self.rect[1]))
         elif death != None:
-            Screen.blit(deadImage, (self.rect[0] - self.rect[2], self.rect[1] - self.rect[3]))
+            Screen.blit(deadImage, (self.rect[0], self.rect[1]))
 
     def move(self):
         if not self.dead:
@@ -81,13 +81,21 @@ class Player():
                 count = count + 1
             if self.direction == 'Right':
                 self.rect[0] += 2
+                self.rect[2] = 50
+                self.rect[3] = 40
             elif self.direction == 'Up':
                 self.rect[1] -= 2
+                self.rect[2] = 40
+                self.rect[3] = 50
             elif self.direction == 'Left':
                 self.rect[0] -= 2
+                self.rect[2] = 50
+                self.rect[3] = 40
             elif self.direction == 'Down':
                 self.rect[1] += 2
-            if self.rect[0] - self.rect[2] <= 0 or self.rect[0] >= width or self.rect[1] - self.rect[3] <= 0 or self.rect[1] >= height:
+                self.rect[2] = 40
+                self.rect[3] = 50
+            if self.rect[0] <= 0 or self.rect[0] + self.rect[2] >= width or self.rect[1] <= 0 or self.rect[1] + self.rect[3] >= height:
                 self.dead = True
 
     def main(self):
@@ -114,16 +122,17 @@ class Line():
             self.cut = True
         if self.direction == 'Right' or self.direction == 'Left':
             pygame.draw.rect(Screen, self.color, (self.rect[0], self.rect[1], self.rect[2], 2))
+            self.rect = (self.rect[0], self.rect[1], self.rect[2], 2)
         if self.direction == 'Up' or self.direction == 'Down':
             pygame.draw.rect(Screen, self.color, (self.rect[0], self.rect[1], 2, self.rect[3]))
+            self.rect = (self.rect[0], self.rect[1], 2, self.rect[3])
 
     def update(self):
         plrPosX = self.parent.rect[0]
         plrPosY = self.parent.rect[1]
         linePosX = self.XY[0]
         linePosY = self.XY[1]
-        self.rect[2] = plrPosX - linePosX
-        self.rect[3] = plrPosY - linePosY
+        self.rect = (self.XY[0], self.XY[1], plrPosX - linePosX, plrPosY - linePosY)
 
 def StartMenu():
     starting = True
@@ -160,7 +169,7 @@ def Main():
         for line in LineList:
             line.draw()
             for plr in PlayerList:
-                if line.rect.colliderect(plr.rect):
+                if plr.rect.colliderect(line.rect):
                     plr.dead = True
                     
         for plr in PlayerList:
